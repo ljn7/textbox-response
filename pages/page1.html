@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      function handleCheckboxChange(checkboxId, isChecked) {
+        const textboxId = checkboxId.replace("checkbox", "textbox");
+        const textbox = document.getElementById(textboxId);
+        textbox.disabled = !isChecked;
+        textbox.value = "";
+
+        socket.emit("checkboxChange", { checkboxId, isChecked });
+        socket.emit("textChange", { textboxId, text: textbox.value });
+      }
+
+      function handleTextChange(textboxId) {
+        const textbox = document.getElementById(textboxId);
+        const text = textbox.value;
+
+        socket.emit("textChange", { textboxId, text });
+      }
+
+      function updateCheckboxState(checkboxState) {
+        for (const checkboxId in checkboxState) {
+          const checkbox = document.getElementById(checkboxId);
+          checkbox.checked = checkboxState[checkboxId];
+
+          const textboxId = checkboxId.replace("checkbox", "textbox");
+          const textbox = document.getElementById(textboxId);
+          textbox.disabled = !checkboxState[checkboxId];
+        }
+      }
+
+      function updateTextValue(textboxId, textValue) {
+        const textbox = document.getElementById(textboxId);
+        textbox.value = textValue;
+      }
+
+      function initializePage() {
+        socket.on("initialState", ({ checkboxState, textValues }) => {
+          updateCheckboxState(checkboxState);
+
+          for (const textboxId in textValues) {
+            updateTextValue(textboxId, textValues[textboxId]);
+          }
+        });
+
+        socket.on("checkboxState", (checkboxState) => {
+          updateCheckboxState(checkboxState);
+        });
+
+        socket.on("textChange", ({ textboxId, text }) => {
+          updateTextValue(textboxId, text);
+        });
+        socket.emit("pageInitiated", {});
+      }
+
+      window.onload = initializePage;
+      
+      function closingWindow() {
+        socket.emit("pageClosing", {});
+        socket.disconnect();
+      }
+
+      window.onbeforeunload = closingWindow;
+
+    </script>
+  </head>
+
+  <body>
+    <h1>Page 1</h1>
+    <input
+      type="checkbox"
+      id="checkbox1"
+      onchange="handleCheckboxChange('checkbox1', this.checked)"
+    />
+    <label for="checkbox1">Checkbox 1</label>
+    <input
+      type="text"
+      id="textbox1"
+      oninput="handleTextChange('textbox1')"
+      disabled
+    />
+    <br />
+    <input
+      type="checkbox"
+      id="checkbox2"
+      onchange="handleCheckboxChange('checkbox2', this.checked)"
+    />
+    <label for="checkbox2">Checkbox 2</label>
+    <input
+      type="text"
+      id="textbox2"
+      oninput="handleTextChange('textbox2')"
+      disabled
+    />
+    <br />
+    <input
+      type="checkbox"
+      id="checkbox3"
+      onchange="handleCheckboxChange('checkbox3', this.checked)"
+    />
+    <label for="checkbox3">Checkbox 3</label>
+    <input
+      type="text"
+      id="textbox3"
+      oninput="handleTextChange('textbox3')"
+      disabled
+    />
+    <br />
+    <input
+      type="checkbox"
+      id="checkbox4"
+      onchange="handleCheckboxChange('checkbox4', this.checked)"
+    />
+    <label for="checkbox4">Checkbox 4</label>
+    <input
+      type="text"
+      id="textbox4"
+      oninput="handleTextChange('textbox4')"
+      disabled
+    />
+    <br />
+    <input
+      type="checkbox"
+      id="checkbox5"
+      onchange="handleCheckboxChange('checkbox5', this.checked)"
+    />
+    <label for="checkbox5">Checkbox 5</label>
+    <input
+      type="text"
+      id="textbox5"
+      oninput="handleTextChange('textbox5')"
+      disabled
+    />
+    <br />
+    <input
+      type="checkbox"
+      id="checkbox6"
+      onchange="handleCheckboxChange('checkbox6', this.checked)"
+    />
+    <label for="checkbox6">Checkbox 6</label>
+    <input
+      type="text"
+      id="textbox6"
+      oninput="handleTextChange('textbox6')"
+      disabled
+    />
+    <br />
+    <input
+      type="checkbox"
+      id="checkbox7"
+      onchange="handleCheckboxChange('checkbox7', this.checked)"
+    />
+    <label for="checkbox7">Checkbox 7</label>
+    <input
+      type="text"
+      id="textbox7"
+      oninput="handleTextChange('textbox7')"
+      disabled
+    />
+    <br />
+  </body>
+</html>

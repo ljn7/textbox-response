@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page 2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      function updateTextValue(textboxId, textValue) {
+        const textbox = document.getElementById(textboxId);
+        textbox.value = textValue;
+      }
+
+      socket.on("checkboxState", ({ checkboxId, checkboxState }) => {
+        if (checkboxState[checkboxId])
+          addTextBox(checkboxId.replace("checkbox", "textbox"));
+        else removeTextBox(checkboxId.replace("checkbox", "textbox"));
+      });
+
+      function addTextBox(textboxId) {
+        var element = document.createElement("input");
+        const linebreak = document.createElement("br");
+        element.type = "text";
+        element.setAttribute("id", textboxId);
+        element.disabled = true;
+        document
+          .getElementById("textbox-container")
+          .appendChild(element)
+          .appendChild(linebreak);
+      }
+
+      function removeTextBox(textboxId) {
+        document.getElementById(textboxId).remove();
+      }
+
+      function initializePage() {
+        socket.on("initialState", ({ textValues, checkboxState }) => {
+          for (const checkboxId in checkboxState) {
+            if (checkboxState[checkboxId])
+              addTextBox(checkboxId.replace("checkbox", "textbox"));
+          }
+          for (const textboxId in textValues) {
+            updateTextValue(textboxId, textValues[textboxId]);
+          }
+        });
+      }
+
+      socket.on("textChange", ({ textboxId, text }) => {
+        updateTextValue(textboxId, text);
+      });
+
+      socket.on("pageClosed", ({}) => {
+        const container = document.getElementById("textbox-container");
+        while (container.firstChild) {
+          container.removeChild(container.lastChild);
+        }
+      });
+      window.onload = initializePage;
+    </script>
+  </head>
+
+  <body>
+    <h1>Page 2</h1>
+    <div id="textbox-container"></div>
+  </body>
+</html>
